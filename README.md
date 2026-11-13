@@ -37,11 +37,26 @@ https://finn-investment-intelligence-production.up.railway.app/profile
 > The demo uses end-of-day market data where applicable. Data mode and timestamps are displayed in the application. Simulated fallback scenarios are explicitly labelled.
 
 ## Screenshots
-Screenshot 2026-11-13 181951.png
-Screenshot 2026-11-13 182007.png
-Screenshot 2026-11-13 182026.png
-Screenshot 2026-11-13 182035.png
-Screenshot 2026-11-13 182345.png
+
+### 1. FINN — Welcome Screen
+Introduction to FINN and its three core modules.
+
+![FINN Splash Screen](assets/screenshots/Screenshot%202026-11-13%20181951.png)
+
+### 2. PUSH — Portfolio Intelligence
+Prioritised portfolio alerts, corporate announcements and market developments.
+
+![FINN PUSH Dashboard](assets/screenshots/Screenshot%202026-11-13%20182007.png)
+
+### 3. PULL — AI-Powered Company Research
+Conversational company research with financial insights and primary-source evidence.
+
+![FINN PULL Research](assets/screenshots/Screenshot%202026-11-13%20182026.png)
+
+### 4. PROFILE — Investor Preferences
+Guest-mode profile and investor preference settings.
+
+![FINN Profile](assets/screenshots/Screenshot%202026-11-13%20182035.png)
 
 ## Technology Stack
 
