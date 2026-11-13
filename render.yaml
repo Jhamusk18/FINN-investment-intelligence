@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: finn
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: FINN_FAST_MODEL
+        value: claude-haiku-5-5
+      - key: FINN_STRONG_MODEL
+        value: claude-sonnet-5-5

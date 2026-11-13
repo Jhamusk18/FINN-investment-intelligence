@@ -1,0 +1,14 @@
+[
+  {"id": "sim-1", "kind": "announcement", "symbol": "INFY", "company": "Infosys Ltd", "sector": "IT Services", "minutes_ago": 14,
+   "title": "SIMULATED · Q2 results: PAT +12% YoY, margin +40 bps", "summary": "Sample item shown only because live feeds are unavailable.",
+   "url": "#", "category": "results", "category_label": "Results", "priority": "high", "method": "sample", "details": null},
+  {"id": "sim-2", "kind": "announcement", "symbol": "RELIANCE", "company": "Reliance Industries Ltd", "sector": "Conglomerate", "minutes_ago": 120,
+   "title": "SIMULATED · Appointment of Head of AI & Cloud", "summary": "Sample item shown only because live feeds are unavailable.",
+   "url": "#", "category": "management_change", "category_label": "Management change", "priority": "medium", "method": "sample", "details": null},
+  {"id": "sim-3", "kind": "announcement", "symbol": "TCS", "company": "Tata Consultancy Services Ltd", "sector": "IT Services", "minutes_ago": 180,
+   "title": "SIMULATED · Board approves buyback", "summary": "Sample item shown only because live feeds are unavailable.",
+   "url": "#", "category": "fund_raise", "category_label": "Fund raise", "priority": "high", "method": "sample", "details": null},
+  {"id": "sim-4", "kind": "announcement", "symbol": "ITC", "company": "ITC Ltd", "sector": "FMCG", "minutes_ago": 400,
+   "title": "SIMULATED · Newspaper publication", "summary": "Sample routine item.",
+   "url": "#", "category": "unclassified", "category_label": "Unclassified", "priority": "routine", "method": "sample", "details": null}
+]

@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; }
+body { @apply bg-[#E9EFEC] text-navy antialiased; font-feature-settings: "cv11", "ss01"; -webkit-tap-highlight-color: transparent; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+.tnum { font-variant-numeric: tabular-nums; }
+
+@layer components {
+  .card { @apply bg-white rounded-2xl border border-line shadow-card; }
+  .pill { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-[3px] text-[11px] font-semibold leading-4 whitespace-nowrap; }
+  .btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-xl bg-emerald text-white font-semibold active:scale-[.98] transition disabled:opacity-50; }
+  .btn-ghost { @apply inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-[#F1F4F3] text-navy font-semibold active:scale-[.98] transition; }
+  .chip-opt { @apply rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition whitespace-nowrap; }
+  .chip-on { @apply border-emerald bg-mint text-forest; }
+  .chip-off { @apply border-line bg-white text-navy; }
+  .section-label { @apply text-[12px] font-bold tracking-wide text-emerald uppercase; }
+}
