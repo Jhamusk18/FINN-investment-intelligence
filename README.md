@@ -1,98 +1,259 @@
-# FINN · Financial Investment Intelligence
+# FINN — Financial Investment Intelligence
 
 > **Intelligence That Drives Informed Investment Decisions.**
 
-A mobile-first investing copilot for Indian equities, built for the ENAM Holdings AI Engineer Build Challenge.
+**FINN** is a mobile-first AI-powered investment intelligence platform for Indian equities, developed for the ENAM Holdings AI Engineer Build Challenge.
 
-- **PUSH** – a prioritised digest of every NSE filing across an 18-stock portfolio, plus threshold alerts on end-of-day price and volume.
-- **PULL** – research on *any* listed company, answered only from primary documents, with page-level citations. It includes **Management Guidance vs Actuals**.
-- **PROFILE** – guest mode. Preferences are stored on the device.
+It helps investors monitor portfolio developments, investigate companies using primary-source documents, and evaluate management's stated guidance against reported financial performance.
 
-No login. Open it and tap **Explore FINN**.
+## Product Overview
 
----
+### PUSH — Portfolio Intelligence
+A prioritised digest of corporate announcements and material developments across an 18-company demo portfolio. Includes:
+- Corporate announcements classified into 17 categories.
+- High, medium and routine priority levels.
+- End-of-day price movement and unusual-volume alerts based on configurable thresholds.
+- Financial results summaries with Revenue, EBITDA, PBT and PAT, including QoQ and YoY comparisons where available.
+- Management-change summaries using company disclosures.
 
-## Run locally
+### PULL — AI-Powered Company Research
+Research any supported listed company using retrieved primary-source documents, including annual reports, earnings-call transcripts, investor presentations and exchange filings.
 
-Requirements: Python 3.11+ and Node 18+.
+- Conversational research with follow-up context.
+- Page-level source references for retrieved evidence.
+- Financial snapshots covering growth, margins, balance sheet and cash flow.
+- **Management Guidance vs Actuals:** compares extracted management commitments with subsequently reported performance.
+- Clear distinction between reported facts, calculated metrics and FINN's interpretation.
 
-```bash
-# 1. backend
-cd backend
-python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-cp ../.env.example ../.env        # optional: add ANTHROPIC_API_KEY
-.venv/bin/uvicorn app.main:app --port 8000
+### PROFILE — Investor Preferences
+Guest-mode profile with device-local preferences, portfolio settings, alert preferences and data information. No account registration is required.
 
-# 2. frontend (second terminal) – dev server proxies /api to :8000
-cd frontend
-npm install
-npm run dev                       # http://localhost:5173
+**Getting started:** Open FINN and select **Explore FINN**.
+
+## Live Demo
+
+**Application:** Add your Railway public URL here.
+
+> The demo uses end-of-day market data where applicable. Data mode and timestamps are displayed in the application. Simulated fallback scenarios are explicitly labelled.
+
+## Screenshots
+
+Add screenshots of the deployed application here:
+- PUSH dashboard
+- PUSH filter sheet
+- PULL company research
+- Management Guidance vs Actuals
+- PROFILE
+
+## Technology Stack
+
+| Layer | Technologies |
+|---|---|
+| Frontend | React, Vite, Tailwind CSS |
+| Backend | Python, FastAPI |
+| Financial data | Yahoo Finance chart API, NSE announcements, Screener.in |
+| Document processing | PyMuPDF, page-aware text extraction |
+| Retrieval | BM25 |
+| AI | Anthropic Claude API |
+| Deployment | Docker, Railway |
+
+## System Architecture
+
+```text
+React + Vite + Tailwind
+        |
+        | REST API
+        v
+FastAPI Backend
+        |
+        +---- PUSH
+        |       +-- Corporate announcement ingestion
+        |       +-- Classification and prioritisation
+        |       +-- EOD price and volume alerts
+        |       +-- Results and management-change summaries
+        |
+        +---- PULL
+        |       +-- Company document retrieval
+        |       +-- PDF page extraction
+        |       +-- BM25 retrieval
+        |       +-- AI-generated cited answers
+        |       +-- Guidance vs Actuals analysis
+        |
+        +---- PROFILE
+                +-- Device-local preferences
+
+External sources:
+NSE / BSE / Screener.in / Yahoo Finance / Company PDFs
 ```
 
-To run a single process instead, run `cd frontend && npm run build`, then start uvicorn. FastAPI serves `frontend/dist` at `/`.
+The Dockerfile builds the frontend and serves it through FastAPI, allowing the application to run as a single service.
 
-## Deploy (one service)
+## Management Guidance vs Actuals
 
-The `Dockerfile` builds the React app and serves it from FastAPI, so there is one URL.
+This feature evaluates management commitments against subsequently reported financial performance.
 
-- **Render:** New → Blueprint → pick this repo (`render.yaml`), set `ANTHROPIC_API_KEY`, then Deploy.
-- **Any Docker host:** `docker build -t finn . && docker run -p 8000:8000 -e ANTHROPIC_API_KEY=... finn`
+The workflow:
+1. Retrieve relevant earnings-call transcripts.
+2. Extract explicitly stated guidance and its reporting period.
+3. Retrieve subsequent reported financial results.
+4. Compare guidance with actual performance on a comparable basis.
+5. Calculate variance and classify the outcome where evidence supports a verdict.
+6. Preserve source references for the underlying statements and reported figures.
 
-## Architecture
+Qualitative statements are not converted into unsupported numerical targets. Comparisons with mismatched reporting periods, currencies or accounting bases are flagged as non-comparable.
 
-```
-                 ┌────────────────────────── React + Vite + Tailwind (mobile-first, 390px) ─────────────────────────┐
-                 │  Splash → PUSH (digest, filter sheet, thresholds) · PULL (chat, cards, guidance) · PROFILE (local) │
-                 └───────────────────────────────────────────────┬───────────────────────────────────────────────────┘
-                                                                 │ /api
-┌──────────────────────────────────────────────── FastAPI ───────┴──────────────────────────────────────────────────────┐
-│ push.py      digest + alerts ── classify.py (rules → cheap LLM) ── results card (QoQ/YoY) ── bio from Reg-30 filing │
-│ research.py  answers · snapshot cards (deterministic) · guidance vs actuals                                         │
-│ rag.py       PDF → pages → chunks (page metadata) → BM25 index per ticker, built on demand with progress            │
-│ llm.py       model routing · structured outputs · prompt caching · cost ledger                                       │
-│ cache.py     JSON disk cache (classifications, PDFs' text, answers, guidance, digests)                              │
-└───────┬───────────────────┬──────────────────────┬─────────────────────────┬──────────────────────────────────────────┘
-   NSE API (→BSE→screener)   Yahoo chart API (EOD)   screener.in (docs, tables)   BSE/NSE PDFs
-```
+## API Overview
 
-### API
 | Endpoint | Purpose |
 |---|---|
-| `GET /api/digest?vol=&px=&material=&overrides=&window=&priority=&companies=&categories=` | 30-day item set with thresholds applied. The client filters this one dataset so counters, feed and labels always agree. |
-| `GET /api/alerts` | Only the items that crossed a threshold or are material |
-| `GET /api/market` | NIFTY 50 / SENSEX / NIFTY IT with EOD or LIVE mode and a timestamp |
-| `GET /api/company/search?q=` | Any listed company (portfolio first, then screener.in search) |
-| `GET /api/quote/{sym}` | EOD close for the PULL header |
-| `POST /api/research/{sym}/prepare` · `GET …/status` | Fetch and index primary documents with per-document progress |
-| `POST /api/research` | Q&A with `[S#]` citations, keeping conversation context |
-| `GET /api/research/{sym}/snapshot` | Deterministic financial, trajectory, balance-sheet and cash cards |
-| `GET /api/research/{sym}/guidance-vs-actuals` | Promise-by-promise scorecard |
-| `POST /api/research/{sym}/upload` | Add your own PDF to the company's index |
+| `GET /api/digest` | Portfolio digest with filter and threshold parameters |
+| `GET /api/alerts` | Material and threshold-triggered alerts |
+| `GET /api/market` | NIFTY 50, SENSEX and NIFTY IT data |
+| `GET /api/company/search?q=` | Company search |
+| `GET /api/quote/{sym}` | Company quote |
+| `POST /api/research/{sym}/prepare` | Prepare and index company documents |
+| `GET /api/research/{sym}/status` | Document processing status |
+| `POST /api/research` | Conversational company research |
+| `GET /api/research/{sym}/snapshot` | Deterministic financial snapshots |
+| `GET /api/research/{sym}/guidance-vs-actuals` | Management guidance scorecard |
+| `POST /api/research/{sym}/upload` | Upload a company PDF |
 
-## Model routing and cost
+For the complete parameter definitions, refer to the backend implementation.
 
-| Step | Engine | Why |
-|---|---|---|
-| Classify filings into 17 categories | **Rules** (NSE subject tag + regex) → `claude-haiku-5-5` only when the rules can't place a filing | ~95% of filings never touch a model. Every verdict is cached by filing URL. |
-| Executive background | Regex excerpt from the filing, or Haiku extraction | A primary source at very low cost |
-| Results numbers | Standardised tables (no model) | Free and exact |
-| Retrieval | **BM25** over page-tagged chunks | No embedding API or model hosting. Financial queries are term-heavy. |
-| PULL answer | `claude-sonnet-5-5`, structured JSON output, system prompt cached | The strong model is used only where reasoning is needed |
-| Guidance extraction | Haiku, once per transcript (cached) | Bulk extraction |
-| Guidance verdicts | Sonnet, once per company per new transcript (cached 24h) | Judgement |
+## Model Routing and Cost Efficiency
 
-Rough cost: classifying a month of filings for 18 stocks costs under $0.01. A PULL answer (~6k input tokens) costs about $0.02. A full guidance scorecard costs about $0.05–0.08, and repeat runs are free from cache. Live spend is shown in Profile → Appearance & data.
+FINN uses a tiered approach to reduce unnecessary model calls.
 
-## Data honesty
-- Every price carries an **EOD** or **LIVE** badge with a timestamp. Alerts use completed sessions only.
-- Simulated items appear only if every live feed fails, and they are labelled everywhere.
-- PULL answers come only from retrieved excerpts. Missing information is reported as "Not found in sources". Each finding is tagged **Reported**, **Calculated** or **FINN view**.
+| Task | Approach |
+|---|---|
+| Filing classification | Rules first; Haiku for ambiguous cases |
+| Executive background | Filing extraction, with AI extraction where needed |
+| Results numbers | Standardised financial tables |
+| Document retrieval | BM25 over page-tagged text chunks |
+| Research answers | Claude Sonnet |
+| Guidance extraction | Claude Haiku |
+| Guidance evaluation | Claude Sonnet |
 
-See [INTEGRATIONS.md](INTEGRATIONS.md) for the status of each source.
+Frequently repeated operations use caching where implemented.
 
-## Repository
+Cost figures are estimates and depend on input/output token usage, document length, caching and current provider pricing. Actual usage should be checked against the application's cost ledger and Anthropic account.
+
+## Data Sources and Transparency
+
+FINN uses:
+- NSE corporate announcements as the primary corporate-filings feed.
+- BSE announcements as a fallback where accessible.
+- Screener.in for company information, financial tables and document discovery.
+- Yahoo Finance chart data for end-of-day prices and volume.
+- Company and exchange-hosted PDFs for research evidence.
+
+The application displays data mode and timestamps. When live feeds are unavailable, fallback or simulated data is labelled.
+
+**AI availability:** Without `ANTHROPIC_API_KEY`, the application can still provide available evidence and PUSH functionality, but AI-powered research and Guidance vs Actuals are limited or unavailable.
+
+See [INTEGRATIONS.md](INTEGRATIONS.md) for source-by-source verification and known limitations.
+
+## Run Locally
+
+### Requirements
+- Python 3.11+
+- Node.js 18+
+- npm
+
+### 1. Backend
+
+From the repository root:
+
+```bash
+cd backend
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+cp ../.env.example ../.env
 ```
-backend/app/       FastAPI app (connectors/, push.py, research.py, rag.py, llm.py, classify.py)
-frontend/src/      screens/ (Splash, Push, FilterSheet, FeedCard, ThresholdsSheet, Pull, PullCards, Profile), components/, lib/
-reference/         Challenge PDFs and design references
+
+Add your Anthropic API key to the root `.env` file if AI features are required.
+
+Start the backend:
+
+```bash
+.venv/bin/uvicorn app.main:app --reload --port 8000
 ```
+
+### 2. Frontend
+
+Open a second terminal at the repository root:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open the local frontend URL shown by Vite (typically `http://localhost:5173`).
+
+The development server proxies `/api` requests to the FastAPI backend.
+
+### 3. Single-process production build
+
+The Dockerfile builds the frontend and serves the generated static files through FastAPI.
+
+```bash
+docker build -t finn .
+docker run -p 8000:8000 -e ANTHROPIC_API_KEY=your_key finn
+```
+
+Do not commit API keys or `.env` files to GitHub.
+
+## Deployment
+
+FINN is deployed as a Docker-based service on Railway.
+
+To reproduce the deployment:
+1. Connect the GitHub repository to a Railway project.
+2. Deploy using the repository's Dockerfile.
+3. Configure `ANTHROPIC_API_KEY` in the Railway service's Variables section if AI features are required.
+4. Generate a public domain in Railway Networking.
+5. Open the generated URL and verify the application.
+
+The repository also contains `render.yaml` for Render-based deployment, but Railway is the deployment used for this submission.
+
+## Known Limitations
+
+- BSE API access may be blocked from cloud environments; the application uses its configured fallback chain.
+- Availability and completeness of filings depend on external source access.
+- Some financial values, including EBITDA, may be derived from standardised tables and are labelled accordingly.
+- Scanned image-only PDFs may not be extractable without OCR.
+- AI-powered research and Guidance vs Actuals require a configured Anthropic API key.
+- Guest preferences are stored locally and are not synchronised across devices.
+- Market data is not guaranteed to be real-time.
+
+## Repository Structure
+
+```text
+backend/
+  app/
+    connectors/
+    push.py
+    research.py
+    rag.py
+    llm.py
+    classify.py
+
+frontend/
+  src/
+    screens/
+    components/
+    lib/
+
+reference/
+  challenge documents and design references
+
+Dockerfile
+.env.example
+INTEGRATIONS.md
+WRITEUP.md
+```
+
+## Disclaimer
+
+FINN is a prototype developed for the ENAM Holdings AI Engineer Build Challenge. It is an informational research and monitoring tool, not investment advice or a recommendation to buy or sell securities.
