@@ -101,10 +101,6 @@ NSE / BSE / Screener.in / Yahoo Finance / Company PDFs
 
 The Dockerfile builds the frontend and serves it through FastAPI, allowing the application to run as a single service.
 
-## Management Guidance vs Actuals
-
-This feature evaluates management commitments against subsequently reported financial performance.
-
 The workflow:
 1. Retrieve relevant earnings-call transcripts.
 2. Extract explicitly stated guidance and its reporting period.
