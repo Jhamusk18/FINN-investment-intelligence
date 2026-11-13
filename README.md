@@ -109,7 +109,6 @@ The workflow:
 5. Calculate variance and classify the outcome where evidence supports a verdict.
 6. Preserve source references for the underlying statements and reported figures.
 
-Qualitative statements are not converted into unsupported numerical targets. Comparisons with mismatched reporting periods, currencies or accounting bases are flagged as non-comparable.
 
 ## API Overview
 
@@ -224,7 +223,6 @@ To reproduce the deployment:
 4. Generate a public domain in Railway Networking.
 5. Open the generated URL and verify the application.
 
-The repository also contains `render.yaml` for Render-based deployment, but Railway is the deployment used for this submission.
 
 ## Known Limitations
 
