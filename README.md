@@ -32,18 +32,12 @@ Guest-mode profile with device-local preferences, portfolio settings, alert pref
 
 ## Live Demo
 
-**Application:** Add your Railway public URL here.
+https://finn-investment-intelligence-production.up.railway.app/profile
 
 > The demo uses end-of-day market data where applicable. Data mode and timestamps are displayed in the application. Simulated fallback scenarios are explicitly labelled.
 
 ## Screenshots
 
-Add screenshots of the deployed application here:
-- PUSH dashboard
-- PUSH filter sheet
-- PULL company research
-- Management Guidance vs Actuals
-- PROFILE
 
 ## Technology Stack
 
