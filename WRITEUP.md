@@ -1,18 +1,29 @@
-# Covering-email writeup (draft)
+# FINN — Financial Investment Intelligence
 
-**What I built.** FINN is a mobile-first investing copilot with three tabs.
+**Intelligence That Drives Informed Investment Decisions.**
 
-- **PUSH** turns each day's NSE filings for an 18-stock portfolio into a short, prioritised digest. Results cards show Revenue, EBITDA, PBT and PAT with QoQ and YoY changes. Management-change cards show the incoming executive's background, taken from the company's own Regulation 30 disclosure. Routine paperwork is collapsed. End-of-day price and volume alerts fire on thresholds the user sets.
-- **PULL** researches any listed company from its own annual reports, call transcripts and presentations. Every claim links to the exact PDF page, and answers keep their context across follow-up questions.
-- **Management Guidance vs Actuals** checks each numerical promise from the last four earnings calls against what was later reported.
+FINN is a mobile-first AI-powered investment intelligence platform built for the ENAM Holdings AI Engineer Build Challenge. It helps investors monitor portfolio developments, research listed companies and evaluate management accountability.
 
-**Key decisions and trade-offs**
-- *Rules before models.* NSE's own subject tags plus regex rules classify about 95% of filings for free. A cheap model handles only the rest, and its answers are cached. The strong model is reserved for research reasoning and guidance verdicts.
-- *BM25 instead of embeddings.* Financial questions are full of exact terms ("FY27", "EBITDA margin"). BM25 has zero inference cost and nothing to host, and the retriever can be swapped later.
-- *Primary-source bios.* SEBI requires a "brief profile" in appointment filings, so FINN reads the filing instead of scraping LinkedIn. That gives verifiable output at almost no cost.
-- *One dataset, client-side filtering.* The backend returns 30 days of items and the app filters them. Counters, feed and pill labels can never disagree.
-- *Honesty over polish.* Every number has an EOD or LIVE badge and a timestamp. Simulated data is labelled. "Not found in sources" is a valid answer.
+### What I Built
 
-**Deliberately left out:** authentication, push notifications, intraday streaming, embeddings and a vector database, OCR for scanned PDFs, and multi-portfolio support.
+- **PUSH – Portfolio Intelligence:** Converts corporate announcements across an 18-stock portfolio into a prioritised digest, with financial results summaries and configurable price and volume alerts.
+- **PULL – AI-Powered Research:** Enables research on listed companies using annual reports, earnings-call transcripts, presentations and exchange filings, with page-level citations and conversational follow-ups. Evaluates numerical management commitments against subsequently reported financial performance, highlighting variances and outcomes.
+- **PROFILE – Investor Preferences:** Provides guest-mode portfolio and alert preferences stored locally on the device.
 
-**Next steps:** scheduled EOD jobs with real push notifications; a guidance-credibility score tracked over time; cross-company comparisons; embeddings plus re-ranking for long annual reports; OCR; and an eval set for citation accuracy.
+### Key Technical Decisions
+
+- **Rules before models:** Uses rule-based filing classification first, reducing unnecessary AI calls.
+- **BM25 retrieval:** Uses page-aware document retrieval without requiring an embedding service.
+- **Caching:** Reuses processed documents and previous results to reduce repeated computation and API costs.
+- **Evidence-first answers:** Separates reported facts, calculated metrics and AI interpretation, with source references.
+- **Data transparency:** Displays EOD/LIVE timestamps and labels simulated fallback data.
+
+### Limitations and Future Scope
+
+The current prototype does not include authentication, intraday streaming, push notifications, OCR for scanned PDFs or multi-portfolio support. Future improvements include scheduled updates, OCR, cross-company comparisons, improved retrieval and longitudinal management-guidance tracking.
+
+### Technology Stack
+
+React, Vite, Tailwind CSS, Python, FastAPI, BM25, Anthropic Claude API, Yahoo Finance and NSE/Screener data sources. Deployed using Docker on Railway.
+
+**FINN aims to make investment research more accessible, structured and evidence-driven.**
