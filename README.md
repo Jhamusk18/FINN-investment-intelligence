@@ -37,7 +37,11 @@ https://finn-investment-intelligence-production.up.railway.app/profile
 > The demo uses end-of-day market data where applicable. Data mode and timestamps are displayed in the application. Simulated fallback scenarios are explicitly labelled.
 
 ## Screenshots
-
+Screenshot 2026-11-13 181951.png
+Screenshot 2026-11-13 182007.png
+Screenshot 2026-11-13 182026.png
+Screenshot 2026-11-13 182035.png
+Screenshot 2026-11-13 182345.png
 
 ## Technology Stack
 
