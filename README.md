@@ -67,7 +67,7 @@ Guest-mode profile and investor preference settings.
 | Financial data | Yahoo Finance chart API, NSE announcements, Screener.in |
 | Document processing | PyMuPDF, page-aware text extraction |
 | Retrieval | BM25 |
-| AI | Anthropic Claude API |
+| AI | Groq free tier (gpt-oss-20b / gpt-oss-120b) by default; Anthropic Claude or Google Gemini also supported |
 | Deployment | Docker, Railway |
 
 ## System Architecture
@@ -134,17 +134,17 @@ FINN uses a tiered approach to reduce unnecessary model calls.
 
 | Task | Approach |
 |---|---|
-| Filing classification | Rules first; Haiku for ambiguous cases |
+| Filing classification | Rules first; fast model (Groq gpt-oss-20b) only for ambiguous cases |
 | Executive background | Filing extraction, with AI extraction where needed |
 | Results numbers | Standardised financial tables |
 | Document retrieval | BM25 over page-tagged text chunks |
-| Research answers | Claude Sonnet |
-| Guidance extraction | Claude Haiku |
-| Guidance evaluation | Claude Sonnet |
+| Research answers | Stronger model (Groq gpt-oss-120b) |
+| Guidance extraction | Fast model (Groq gpt-oss-20b) |
+| Guidance evaluation | Stronger model (Groq gpt-oss-120b) |
 
 Frequently repeated operations use caching where implemented.
 
-Cost figures are estimates and depend on input/output token usage, document length, caching and current provider pricing. Actual usage should be checked against the application's cost ledger and Anthropic account.
+Cost figures are estimates and depend on input/output token usage, document length, caching and current provider pricing. On the Groq free tier the AI layer costs $0; FINN retries automatically when the free-tier tokens-per-minute limit is reached. With a paid provider, check usage against the application's cost ledger and the provider account.
 
 ## Data Sources and Transparency
 
@@ -157,7 +157,7 @@ FINN uses:
 
 The application displays data mode and timestamps. When live feeds are unavailable, fallback or simulated data is labelled.
 
-**AI availability:** Without `ANTHROPIC_API_KEY`, the application can still provide available evidence and PUSH functionality, but AI-powered research and Guidance vs Actuals are limited or unavailable.
+**AI availability:** Set `GROQ_API_KEY` (free, console.groq.com) to enable the AI layer; `ANTHROPIC_API_KEY` or `GEMINI_API_KEY` also work. Without any key, the application can still provide available evidence and PUSH functionality, but AI-powered research and Guidance vs Actuals are limited or unavailable.
 
 See [INTEGRATIONS.md](INTEGRATIONS.md) for source-by-source verification and known limitations.
 
@@ -179,7 +179,7 @@ python3 -m venv .venv
 cp ../.env.example ../.env
 ```
 
-Add your Anthropic API key to the root `.env` file if AI features are required.
+Add a free `GROQ_API_KEY` (or `ANTHROPIC_API_KEY` / `GEMINI_API_KEY`) to the root `.env` file if AI features are required.
 
 Start the backend:
 
@@ -207,7 +207,7 @@ The Dockerfile builds the frontend and serves the generated static files through
 
 ```bash
 docker build -t finn .
-docker run -p 8000:8000 -e ANTHROPIC_API_KEY=your_key finn
+docker run -p 8000:8000 -e GROQ_API_KEY=your_key finn
 ```
 
 Do not commit API keys or `.env` files to GitHub.
@@ -219,7 +219,7 @@ FINN is deployed as a Docker-based service on Railway.
 To reproduce the deployment:
 1. Connect the GitHub repository to a Railway project.
 2. Deploy using the repository's Dockerfile.
-3. Configure `ANTHROPIC_API_KEY` in the Railway service's Variables section if AI features are required.
+3. Configure `GROQ_API_KEY` (free tier) in the Railway service's Variables section if AI features are required.
 4. Generate a public domain in Railway Networking.
 5. Open the generated URL and verify the application.
 
@@ -230,7 +230,7 @@ To reproduce the deployment:
 - Availability and completeness of filings depend on external source access.
 - Some financial values, including EBITDA, may be derived from standardised tables and are labelled accordingly.
 - Scanned image-only PDFs may not be extractable without OCR.
-- AI-powered research and Guidance vs Actuals require a configured Anthropic API key.
+- AI-powered research and Guidance vs Actuals require an AI key (free Groq key supported). Free-tier rate limits can make the first Guidance vs Actuals run take up to about a minute; results are then cached.
 - Guest preferences are stored locally and are not synchronised across devices.
 - Market data is not guaranteed to be real-time.
 

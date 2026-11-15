@@ -102,6 +102,7 @@ def answer(sym: str, question: str, history: list[dict], view: str | None = None
     valid = {s["id"] for s in sources}
     for f in out.get("findings", []):
         f["sources"] = [x for x in f.get("sources", []) if x in valid]
+        f["text"] = re.sub(r"\s*\[S\d+(?:\s*[,;]\s*S\d+)*\]", "", f.get("text", ""))  # chips show the citations
     cited = set(re.findall(r"S\d+", out.get("answer", "") + " " + (out.get("verdict") or "")))
     for f in out.get("findings", []):
         cited |= set(f["sources"])
@@ -179,7 +180,7 @@ def guidance(sym: str) -> dict:
     idx = rag.get_index(sym) or rag.build_index(sym)
     transcripts = [d for d in idx["docs"].values() if d["kind"] == "transcript"][:4]
     if not llm.enabled():
-        return {"available": False, "reason": "Guidance vs Actuals needs the AI layer (ANTHROPIC_API_KEY is not set on this server).",
+        return {"available": False, "reason": "Guidance vs Actuals needs the AI layer (set GROQ_API_KEY or GEMINI_API_KEY for a free tier, or ANTHROPIC_API_KEY).",
                 "calls_found": [d["title"] for d in transcripts]}
     if not transcripts:
         return {"available": False, "reason": "No earnings-call transcripts found for this company."}
@@ -200,7 +201,7 @@ def guidance(sym: str) -> dict:
 
     items = []
     for d in reversed(transcripts):  # oldest first
-        hits = rag.search(idx, GUIDANCE_Q, k=6, doc_ids={d["id"]}, per_doc=6)
+        hits = rag.search(idx, GUIDANCE_Q, k=4, doc_ids={d["id"]}, per_doc=4)
         ids = [reg(h) for h in hits]
         block = "\n\n".join(f"[{i}] {d['title']} (p.{h['page']})\n{h['text']}" for i, h in zip(ids, hits))
         ck = "gx:" + d["id"]
@@ -213,16 +214,20 @@ def guidance(sym: str) -> dict:
     if not items:
         return {"available": True, "rows": [], "summary": "No explicit numerical guidance found in the last four call transcripts.",
                 "sources": registry}
-    items = items[:14]
-    # evidence for actuals: standardised tables + later commentary on each metric
+    free_tier = llm.config.PROVIDER in llm.FREE_TIER  # tight tokens-per-minute budget on free tiers
+    items = items[:8] if free_tier else items[:14]
+    # The judge sees only what it needs: the passages the guidance was quoted from,
+    # the standardised tables, and later commentary on each guided metric.
+    needed = {it.get("source") for it in items}
     for t in rag.search(idx, "quarterly revenue operating profit margin net profit", k=2, kinds={"table"}, per_doc=2):
-        reg(t)
+        needed.add(reg(t))
     for it in items:
-        for h in rag.search(idx, f"{it['metric']} {it['period_guided_for']} actual delivered", k=2,
+        for h in rag.search(idx, f"{it['metric']} {it['period_guided_for']} actual delivered", k=1 if free_tier else 2,
                             kinds={"transcript", "presentation"}, per_doc=1):
-            reg(h)
-    block = "\n\n".join(f"[{s['id']}] {s['title']} ({'p.' + str(s['page']) if s['page'] else 'table'})\n{c['text']}"
-                        for s, c in zip(registry, chunks_for))
+            needed.add(reg(h))
+    cap = 650 if free_tier else 1200
+    block = "\n\n".join(f"[{s['id']}] {s['title']} ({'p.' + str(s['page']) if s['page'] else 'table'})\n{c['text'][:cap]}"
+                        for s, c in zip(registry, chunks_for) if s["id"] in needed)
     card = llm.judge_guidance(idx["company"]["name"], json.dumps(items, ensure_ascii=False), block)
     valid = {s["id"] for s in registry}
     cited = set(re.findall(r"S\d+", json.dumps(card))) & valid

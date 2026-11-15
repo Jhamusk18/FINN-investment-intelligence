@@ -148,7 +148,7 @@ export default function Profile() {
               <StatusRow ok={st.sources?.announcements?.ok ?? null} label="Filings digest" detail={st.sources?.announcements?.detail || 'Builds when PUSH loads'} />
               <StatusRow ok={st.sources?.prices?.ok ?? null} label="Prices & volume (Yahoo Finance)" detail={`EOD bars · ${st.sources?.prices?.detail || 'loads with PUSH'} · market ${st.market_open ? 'open (index tiles LIVE, quotes may be delayed)' : 'closed (EOD)'}`} />
               <StatusRow ok label="Fundamentals & documents (screener.in → BSE/NSE PDFs)" detail="Annual reports, call transcripts, investor presentations, standardised financials" />
-              <StatusRow ok={st.llm?.enabled} label="AI layer" detail={st.llm?.enabled ? `Fast: ${st.llm.fast_model} · Strong: ${st.llm.strong_model} · ${st.llm.calls} calls · $${st.llm.usd.toFixed(4)} since ${stamp(st.llm.since)}` : 'Not configured (no API key): PULL shows evidence passages; Guidance vs Actuals is off'} />
+              <StatusRow ok={st.llm?.enabled} label="AI layer" detail={st.llm?.enabled ? `${{ groq: 'Groq (free tier)', gemini: 'Google Gemini (free tier)' }[st.llm.provider] || 'Anthropic Claude'} · Fast: ${st.llm.fast_model} · Strong: ${st.llm.strong_model} · ${st.llm.calls} calls${st.llm.provider === 'anthropic' ? ` · $${st.llm.usd.toFixed(4)}` : ' · $0'} since ${stamp(st.llm.since)}` : 'Not configured (no API key): PULL shows evidence passages; Guidance vs Actuals is off'} />
               {st.force_sample && <StatusRow ok={false} label="Sample mode forced" detail="All PUSH items are SIMULATED" />}
             </div>
           )}

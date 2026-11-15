@@ -1,15 +1,21 @@
 """LLM layer: model routing, structured outputs, caching hooks and a cost ledger.
 
-FAST_MODEL (Claude Haiku)  -> bulk work: classify filings, extract bios, extract guidance.
-STRONG_MODEL (Claude Sonnet) -> reasoning: PULL answers, guidance-vs-actual verdicts.
+Two interchangeable providers behind one function (_parse):
+  - Anthropic (ANTHROPIC_API_KEY): Claude Haiku for bulk work, Claude Sonnet for reasoning.
+  - Groq free tier (GROQ_API_KEY): gpt-oss-20b for bulk work, gpt-oss-120b for reasoning.
+  - Google Gemini free tier (GEMINI_API_KEY): Flash-Lite.
+FAST_MODEL  -> bulk work: classify filings, extract bios, extract guidance.
+STRONG_MODEL -> reasoning: PULL answers, guidance-vs-actual verdicts.
 If no API key is configured every function degrades gracefully and the UI says so."""
 import json
+import re
 import threading
 import time
 from typing import Literal
 
 import anthropic
-from pydantic import BaseModel, Field
+import httpx
+from pydantic import BaseModel, Field, ValidationError
 
 from . import config
 
@@ -18,6 +24,7 @@ PRICES = {  # USD per 1M tokens (input, output)
     "claude-sonnet-5-5": (2.00, 10.00),
     "claude-opus-5-5": (4.00, 20.00),
 }
+FREE_TIER = {"groq", "gemini"}  # free-tier providers: calls recorded as $0
 
 _client = None
 _lock = threading.Lock()
@@ -36,7 +43,7 @@ def client() -> anthropic.Anthropic:
 
 
 def _record(task: str, model: str, usage) -> None:
-    pin, pout = PRICES.get(model, (2.0, 10.0))
+    pin, pout = (0.0, 0.0) if config.PROVIDER in FREE_TIER else PRICES.get(model, (2.0, 10.0))
     inp = getattr(usage, "input_tokens", 0) or 0
     out = getattr(usage, "output_tokens", 0) or 0
     cr = getattr(usage, "cache_read_input_tokens", 0) or 0
@@ -53,7 +60,73 @@ def _record(task: str, model: str, usage) -> None:
         t["usd"] = round(t["usd"] + usd, 6)
 
 
+class _Usage:
+    def __init__(self, meta: dict):
+        self.input_tokens = meta.get("prompt_tokens", 0)
+        self.output_tokens = meta.get("completion_tokens", 0)
+        self.cache_read_input_tokens = 0
+
+
+def _compat_parse(task: str, model: str, schema, system: str, user: str, max_tokens: int):
+    """Free-tier call (Groq or Gemini, OpenAI-compatible format) with JSON output,
+    validated against the same Pydantic schema as the Claude path."""
+    url, key = config.OPENAI_COMPAT[config.PROVIDER]
+    sys_text = (system + "\n\nReturn ONLY one JSON object (no markdown) that validates against this JSON Schema:\n"
+                + json.dumps(schema.model_json_schema()))
+    prompt = user
+    last_err = None
+    tries = 5
+    for attempt in range(tries):
+        body = {
+            "model": model,
+            "messages": [{"role": "system", "content": sys_text}, {"role": "user", "content": prompt}],
+            "response_format": {"type": "json_object"},
+            "temperature": 0.2,
+            "max_tokens": min(3000 if config.PROVIDER == "groq" else 8000, max(2000, max_tokens)),
+        }
+        if config.PROVIDER == "groq":
+            body["reasoning_effort"] = "low"  # keeps hidden reasoning short: faster, fewer free-tier tokens
+        r = httpx.post(url, json=body, timeout=120,
+                       headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"})
+        last = attempt == tries - 1
+        if r.status_code == 429 and not last:
+            # Free-tier tokens-per-minute limit: wait as long as the provider asks (capped), then retry.
+            wait = r.headers.get("retry-after")
+            m = re.search(r"try again in ([\d.]+)s", r.text)
+            secs = float(wait) if wait and wait.replace(".", "", 1).isdigit() else float(m.group(1)) if m else 10.0
+            time.sleep(min(30.0, secs + 1))
+            last_err = "rate limited"
+            continue
+        if r.status_code in (500, 502, 503, 504) and not last:
+            time.sleep(4)
+            last_err = f"HTTP {r.status_code}"
+            continue
+        if r.status_code == 400 and "json_validate_failed" in r.text and not last:
+            last_err = "invalid JSON"
+            prompt = user + "\n\nReply with ONE valid JSON object only."
+            continue
+        if r.status_code >= 400:
+            raise RuntimeError(f"{config.PROVIDER} HTTP {r.status_code}: {r.text[:200]}")
+        data = r.json()
+        if isinstance(data, list):
+            data = data[0]
+        _record(task, model, _Usage(data.get("usage") or {}))
+        choices = data.get("choices") or []
+        if not choices:
+            raise RuntimeError("model returned no answer (blocked or empty)")
+        text = (choices[0].get("message", {}).get("content") or "").strip()
+        text = text.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+        try:
+            return schema.model_validate_json(text)
+        except ValidationError as e:
+            last_err = str(e)[:300]
+            prompt = user + f"\n\nYour previous reply did not match the schema ({last_err}). Reply again with valid JSON only."
+    raise RuntimeError(f"{config.PROVIDER} output invalid: {last_err}")
+
+
 def _parse(task: str, model: str, schema, system: str, user: str, max_tokens: int = 4000, effort: str = "low"):
+    if config.PROVIDER in config.OPENAI_COMPAT:
+        return _compat_parse(task, model, schema, system, user, max_tokens)
     resp = client().messages.parse(
         model=model,
         max_tokens=max_tokens,
@@ -204,7 +277,7 @@ def judge_guidance(company: str, guidance_json: str, sources_block: str) -> dict
 def ledger() -> dict:
     with _lock:
         return json.loads(json.dumps(LEDGER)) | {
-            "enabled": enabled(), "fast_model": config.FAST_MODEL, "strong_model": config.STRONG_MODEL,
+            "enabled": enabled(), "provider": config.PROVIDER, "fast_model": config.FAST_MODEL, "strong_model": config.STRONG_MODEL,
             "since": _START,
         }
 
