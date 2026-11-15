@@ -25,7 +25,7 @@ export function DataModePill({ mode }) {
   }
   const [label, dot] = map[mode] || map.LOADING
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1.5 text-[13px] font-semibold text-navy shadow-card">
+    <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-[13px] font-semibold text-navy shadow-card">
       <span className={`h-2 w-2 rounded-full ${dot}`} />
       {label}
     </span>

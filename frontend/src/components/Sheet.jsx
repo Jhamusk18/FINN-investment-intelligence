@@ -12,7 +12,7 @@ export default function Sheet({ open, onClose, title, right, children, footer, m
   return (
     <div className="absolute inset-0 z-50 flex flex-col justify-end" role="dialog" aria-modal="true">
       <div className="absolute inset-0 bg-[#0B2A20]/45 backdrop-blur-[1px] animate-fadein" onClick={onClose} />
-      <div className="relative flex flex-col rounded-t-[26px] bg-white shadow-sheet animate-slideup" style={{ maxHeight: maxH }}>
+      <div className="relative flex flex-col rounded-t-[26px] bg-surface shadow-sheet animate-slideup" style={{ maxHeight: maxH }}>
         <div className="flex justify-center pt-2.5"><div className="h-1.5 w-12 rounded-full bg-[#D5DDDA]" /></div>
         <div className="flex items-center justify-between px-5 pb-3 pt-3 border-b border-line">
           <h2 className="text-[20px] font-bold text-navy">{title}</h2>

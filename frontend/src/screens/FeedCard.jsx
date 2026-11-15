@@ -58,7 +58,7 @@ function ResultsTable({ d }) {
           {d.metrics.map((m) => (
             <tr key={m.metric} className="border-t border-line">
               <td className="px-3 py-2 font-semibold text-navy">
-                {m.metric}{m.metric === 'EBITDA' && m.value != null && <span className="ml-1 rounded bg-[#EEF2F1] px-1 text-[10px] font-semibold text-slate2">derived</span>}
+                {m.metric}{m.metric === 'EBITDA' && m.value != null && <span className="ml-1 rounded bg-offwhite px-1 text-[10px] font-semibold text-slate2">derived</span>}
               </td>
               <td className="px-2 py-2 text-right">{m.value == null ? <span className="text-[11.5px] text-slate2">{m.note || 'n/a'}</span> : inr(m.value)}</td>
               <Delta v={m.qoq} /><Delta v={m.yoy} last />

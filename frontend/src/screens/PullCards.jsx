@@ -31,11 +31,11 @@ export function WithCites({ text, sources }) {
 export function SourcesList({ sources }) {
   if (!sources?.length) return null
   return (
-    <div className="mt-3 border-t border-[#CFE6DA] pt-2.5">
+    <div className="mt-3 border-t border-line pt-2.5">
       <div className="flex items-center gap-1.5 text-[14px] font-bold text-forest"><FileText size={15} /> Sources Cited</div>
       <div className="mt-2 space-y-1.5">
         {sources.map((s) => (
-          <a key={s.id} href={s.url} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-lg bg-[#DDF1E7] px-2.5 py-2 text-[12.5px] text-navy">
+          <a key={s.id} href={s.url} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-lg bg-mint px-2.5 py-2 text-[12.5px] text-navy">
             <FileText size={15} className="shrink-0 text-forest" />
             <span className="font-bold">[{s.id}]</span>
             <span className="min-w-0 flex-1 truncate">{s.title}{s.page ? ` (p.${s.page})` : s.kind === 'table' ? ' (table)' : ''}</span>
@@ -78,7 +78,7 @@ export function AnswerBody({ r, onSave, saved }) {
           })}
         </ul>
       )}
-      {r.verdict && <p className="mt-2 rounded-lg bg-white/70 px-2.5 py-2 text-[13px] font-medium text-navy"><span className="font-bold text-forest">So what: </span><WithCites text={r.verdict} sources={r.sources} /></p>}
+      {r.verdict && <p className="mt-2 rounded-lg bg-surface/70 px-2.5 py-2 text-[13px] font-medium text-navy"><span className="font-bold text-forest">So what: </span><WithCites text={r.verdict} sources={r.sources} /></p>}
       {r.not_found?.length > 0 && (
         <p className="mt-2 flex gap-1.5 text-[12.5px] text-md-fg"><AlertCircle size={14} className="mt-0.5 shrink-0" />Not found in sources: {r.not_found.join('; ')}</p>
       )}
@@ -105,12 +105,12 @@ export function SnapshotCard({ view, s }) {
         <div className="text-[13px] font-bold text-navy">Financial snapshot · {short(q.period)} quarter</div>
         <div className="mt-2 grid grid-cols-3 gap-2">
           {tiles.map(([k, v, d]) => (
-            <div key={k} className="rounded-xl bg-white p-2"><div className="text-[11px] text-slate2">{k}</div><div className="text-[15px] font-extrabold text-navy tnum">{v}</div><div className="text-[11px] font-semibold text-emerald">{d}</div></div>
+            <div key={k} className="rounded-xl bg-surface p-2"><div className="text-[11px] text-slate2">{k}</div><div className="text-[15px] font-extrabold text-navy tnum">{v}</div><div className="text-[11px] font-semibold text-emerald">{d}</div></div>
           ))}
         </div>
         <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[12px]">
           {['Market Cap', 'Stock P/E', 'ROCE', 'ROE', 'Dividend Yield', 'Book Value'].filter((k) => r[k]).map((k) => (
-            <div key={k} className="flex justify-between border-b border-[#D5EADF] py-0.5"><span className="text-slate2">{k}</span><span className="font-semibold text-navy">{r[k]}</span></div>
+            <div key={k} className="flex justify-between border-b border-line py-0.5"><span className="text-slate2">{k}</span><span className="font-semibold text-navy">{r[k]}</span></div>
           ))}
         </div>
         <p className="mt-1 text-[10.5px] text-slate2">Ratios use the latest price (screener.in) and are not EOD-timestamped.</p>
@@ -140,7 +140,7 @@ export function SnapshotCard({ view, s }) {
         <div className="text-[13px] font-bold text-navy">Balance sheet · {short(b.period)}</div>
         <div className="mt-2 grid grid-cols-3 gap-2">
           {[['Borrowings', `₹${inr(b.borrowings)} Cr`], ['Net worth', `₹${inr(b.net_worth)} Cr`], ['Debt / Equity', `${b.debt_to_equity ?? '—'}×`]].map(([k, v]) => (
-            <div key={k} className="rounded-xl bg-white p-2"><div className="text-[11px] text-slate2">{k}</div><div className="text-[15px] font-extrabold text-navy tnum">{v}</div></div>
+            <div key={k} className="rounded-xl bg-surface p-2"><div className="text-[11px] text-slate2">{k}</div><div className="text-[15px] font-extrabold text-navy tnum">{v}</div></div>
           ))}
         </div>
         <div className="mt-2"><MiniBars labels={b.periods.map(short)} series={[{ name: 'Borrowings', values: b.borrowings_trend, color: '#F2B01E' }]} h={60} /></div>
@@ -167,7 +167,7 @@ const VERDICT = {
   Delivered: ['bg-rt-bg text-rt-fg', CheckCircle2],
   'Partially delivered': ['bg-md-bg text-md-fg', MinusCircle],
   Missed: ['bg-hi-bg text-hi-fg', XCircle],
-  Pending: ['bg-[#EEF2F1] text-slate2', Clock],
+  Pending: ['bg-offwhite text-slate2', Clock],
   Raised: ['bg-rt-bg text-rt-fg', CheckCircle2],
   Cut: ['bg-hi-bg text-hi-fg', XCircle],
 }
@@ -187,7 +187,7 @@ export function GuidanceCard({ g }) {
     <div>
       <div className="flex items-center justify-between">
         <div className="text-[14px] font-extrabold text-forest">Management Guidance vs Actuals</div>
-        <span className="pill bg-white text-slate2">{g.rows?.length || 0} promises</span>
+        <span className="pill bg-surface text-slate2">{g.rows?.length || 0} promises</span>
       </div>
       <div className="mt-1.5 flex flex-wrap gap-1.5">
         {Object.entries(tally).map(([k, v]) => <span key={k} className={`pill ${VERDICT[k]?.[0]}`}>{v} {k}</span>)}
@@ -197,7 +197,7 @@ export function GuidanceCard({ g }) {
         {(g.rows || []).map((r, i) => {
           const [cls, Icon] = VERDICT[r.verdict] || VERDICT.Pending
           return (
-            <div key={i} className="rounded-xl border border-[#CFE6DA] bg-white p-2.5">
+            <div key={i} className="rounded-xl border border-line bg-surface p-2.5">
               <div className="flex items-start justify-between gap-2">
                 <div className="text-[13.5px] font-bold text-navy">{r.metric}</div>
                 <span className={`pill shrink-0 ${cls}`}><Icon size={12} />{r.verdict}</span>

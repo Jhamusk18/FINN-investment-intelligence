@@ -21,7 +21,7 @@ function Wave({ flip = false }) {
 export default function Splash() {
   const nav = useNavigate()
   return (
-    <div className="relative flex h-full flex-col overflow-y-auto no-scrollbar bg-white">
+    <div className="relative flex h-full flex-col overflow-y-auto no-scrollbar bg-surface">
       <Wave />
       <div className="relative z-10 flex flex-1 flex-col items-center px-6 pt-14 text-center">
         <LogoTile size={104} className="drop-shadow-lg" />

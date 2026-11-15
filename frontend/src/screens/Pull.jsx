@@ -37,7 +37,7 @@ function CompanyPicker({ company, onPick, portfolio, adhoc }) {
   const list = q.trim().length >= 2 ? res : [...adhoc.map((c) => ({ ...c, tag: 'Research idea' })), ...portfolio.map((c) => ({ ...c, tag: 'Portfolio' }))]
   return (
     <div className="relative">
-      <button onClick={() => setOpen(!open)} className="flex h-[52px] w-full items-center gap-3 rounded-2xl border border-[#D3DDD9] bg-white px-4 shadow-card">
+      <button onClick={() => setOpen(!open)} className="flex h-[52px] w-full items-center gap-3 rounded-2xl border border-line bg-surface px-4 shadow-card">
         <Search size={21} className="text-slate2" />
         <span className="min-w-0 flex-1 truncate text-left text-[16px] text-navy">
           {company ? <><b>{company.symbol}</b> – {company.name}</> : <span className="text-slate2">Search any NSE / BSE company…</span>}
@@ -45,7 +45,7 @@ function CompanyPicker({ company, onPick, portfolio, adhoc }) {
         <ChevronDown size={20} className="text-navy" />
       </button>
       {open && (
-        <div className="absolute inset-x-0 top-[58px] z-40 max-h-[60vh] overflow-hidden rounded-2xl border border-line bg-white shadow-sheet animate-fadein">
+        <div className="absolute inset-x-0 top-[58px] z-40 max-h-[60vh] overflow-hidden rounded-2xl border border-line bg-surface shadow-sheet animate-fadein">
           <div className="flex items-center gap-2 border-b border-line px-3 py-2.5">
             <Search size={17} className="text-slate2" />
             <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Type a name or ticker, e.g. Bajaj Auto, PIDILITIND" className="w-full text-[14px] outline-none" />
@@ -71,7 +71,7 @@ function IndexProgress({ st }) {
   if (!st || st.state === 'ready') return null
   const failed = st.state === 'error'
   return (
-    <div className={`rounded-2xl border p-3 ${failed ? 'border-hi-bd bg-hi-bg' : 'border-[#CFE6DA] bg-white'}`}>
+    <div className={`rounded-2xl border p-3 ${failed ? 'border-hi-bd bg-hi-bg' : 'border-line bg-surface'}`}>
       <div className="flex items-center gap-2 text-[13px] font-semibold text-navy">
         {failed ? <AlertTriangle size={16} className="text-hi-fg" /> : <Loader2 size={16} className="animate-spin text-emerald" />}
         {failed ? `Couldn’t prepare documents: ${st.message}` : st.message || 'Preparing primary documents…'}
@@ -95,7 +95,7 @@ function Bubble({ m, saved, onSave }) {
   if (m.role === 'user') {
     return (
       <div className="flex items-start justify-end gap-2.5">
-        <div className="max-w-[78%] rounded-2xl rounded-tr-md bg-[#EEF1F3] px-3.5 py-2.5">
+        <div className="max-w-[78%] rounded-2xl rounded-tr-md bg-offwhite px-3.5 py-2.5">
           <div className="text-[11.5px] text-slate2">{m.time}</div>
           <div className="text-[15px] leading-snug text-navy">{m.text}</div>
         </div>
@@ -104,19 +104,19 @@ function Bubble({ m, saved, onSave }) {
     )
   }
   if (m.role === 'system') {
-    return <div className="text-center"><span className="rounded-full bg-[#E9EFEC] px-3 py-1 text-[11.5px] text-slate2">{m.text}</span></div>
+    return <div className="text-center"><span className="rounded-full bg-offwhite px-3 py-1 text-[11.5px] text-slate2">{m.text}</span></div>
   }
   return (
     <div className="flex items-start gap-2.5">
       <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-mint text-emerald"><Bot size={21} /></div>
-      <div className="min-w-0 flex-1 rounded-2xl rounded-tl-md bg-[#E3F4EC] px-3.5 py-3">
+      <div className="min-w-0 flex-1 rounded-2xl rounded-tl-md bg-mint px-3.5 py-3">
         <div className="text-[11.5px] text-slate2">{m.time}{m.company ? ` · ${m.company}` : ''}</div>
         {m.pending && (
           <div className="mt-1 flex items-center gap-2 text-[13.5px] text-slate2"><Loader2 size={15} className="animate-spin text-emerald" />{m.pending}</div>
         )}
         {m.text && <p className="mt-0.5 text-[15px] leading-relaxed text-navy">{m.text}</p>}
         {m.error && <p className="mt-1 flex gap-1.5 text-[13px] text-hi-fg"><AlertTriangle size={15} className="mt-0.5 shrink-0" />{m.error}</p>}
-        {m.snapshot && <div className="mt-2 rounded-xl bg-[#D9EFE4]/60 p-2.5"><SnapshotCard view={m.view} s={m.snapshot} /></div>}
+        {m.snapshot && <div className="mt-2 rounded-xl bg-mint/60 p-2.5"><SnapshotCard view={m.view} s={m.snapshot} /></div>}
         {m.guidance && <div className="mt-1"><GuidanceCard g={m.guidance} /></div>}
         {m.answer && <div className={m.snapshot ? 'mt-3' : 'mt-1'}><AnswerBody r={m.answer} saved={saved} onSave={onSave} /></div>}
       </div>
@@ -272,13 +272,13 @@ export default function Pull() {
       </header>
 
       <div ref={scroller} className="flex-1 space-y-4 overflow-y-auto px-3.5 pb-4 pt-2 no-scrollbar">
-        <div className="text-center"><span className="rounded-full bg-[#E3EAE7] px-4 py-1 text-[13px] text-slate2">Today</span></div>
+        <div className="text-center"><span className="rounded-full bg-offwhite px-4 py-1 text-[13px] text-slate2">Today</span></div>
         <Bubble m={{ role: 'finn', time: nowT(), text: `Hello! What financial filing or portfolio metric would you like to interrogate today${company ? ` for ${company.name}` : ''}? I answer only from primary documents and cite every claim.` }} />
         <IndexProgress st={status} />
         <div className="-mx-3.5 flex gap-2 overflow-x-auto px-3.5 no-scrollbar">
           {CHIPS.map(([k, l, star]) => (
             <button key={k} disabled={busy} onClick={() => runView(k)}
-              className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-3 py-1.5 text-[12.5px] font-semibold disabled:opacity-50 ${star ? 'border-forest bg-forest text-white' : 'border-line bg-white text-navy'}`}>
+              className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-3 py-1.5 text-[12.5px] font-semibold disabled:opacity-50 ${star ? 'border-forest bg-forest text-white' : 'border-line bg-surface text-navy'}`}>
               {star && <Target size={13} />}{l}
             </button>
           ))}
@@ -287,7 +287,7 @@ export default function Pull() {
       </div>
 
       <div className="shrink-0 px-3 pb-2.5 pt-1.5">
-        <div className="flex items-center gap-2 rounded-[22px] border border-line bg-white p-2 shadow-card">
+        <div className="flex items-center gap-2 rounded-[22px] border border-line bg-surface p-2 shadow-card">
           <input ref={fileRef} type="file" accept="application/pdf" className="hidden" onChange={onFile} />
           <button onClick={() => fileRef.current?.click()} className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-2xl bg-mint px-3 text-[14px] font-semibold text-navy">
             <Paperclip size={17} className="text-emerald" />Drop PDF

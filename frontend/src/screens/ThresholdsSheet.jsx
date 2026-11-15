@@ -28,7 +28,7 @@ export default function ThresholdsSheet() {
     <Sheet open={thresholdsOpen} onClose={close} title="Alert thresholds"
       right={<button className="text-[15px] font-semibold text-emerald" onClick={() => setD(DEFAULT_THRESHOLDS)}>Defaults</button>}
       footer={<div className="flex gap-3">
-        <button className="btn-ghost h-12 flex-1 bg-white" onClick={close}>Cancel</button>
+        <button className="btn-ghost h-12 flex-1 bg-surface" onClick={close}>Cancel</button>
         <button className="btn-primary h-12 flex-[1.6]" onClick={() => { setThresholds(d); close() }}>Save thresholds</button>
       </div>}>
       <div className="space-y-5 px-5 py-4">

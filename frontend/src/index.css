@@ -3,18 +3,37 @@
 @tailwind utilities;
 
 html, body, #root { height: 100%; }
-body { @apply bg-[#E9EFEC] text-navy antialiased; font-feature-settings: "cv11", "ss01"; -webkit-tap-highlight-color: transparent; }
+/* Theme palettes (RGB triplets). Light is the default; html.dark switches everything. */
+:root {
+  --c-forest: 7 91 67; --c-emerald: 13 147 103; --c-emerald-700: 10 124 87;
+  --c-mint: 231 245 239; --c-offwhite: 246 249 248; --c-surface: 255 255 255;
+  --c-navy: 20 43 58; --c-slate: 83 98 115; --c-line: 226 233 230;
+  --page: #E9EFEC;
+  color-scheme: light;
+}
+html.dark {
+  --c-forest: 110 225 180; --c-emerald: 40 190 135; --c-emerald-700: 30 160 115;
+  --c-mint: 22 48 40; --c-offwhite: 12 17 20; --c-surface: 24 32 38;
+  --c-navy: 232 240 236; --c-slate: 150 166 160; --c-line: 40 54 60;
+  --page: #0A0F12;
+  color-scheme: dark;
+}
+html.dark .text-white { color: #0A0F12; }
+html.dark header { background: var(--c-offwhite) !important; }
+html.dark .bg-\[\#E9EFEC\] { background: var(--page) !important; }
+html.dark .shadow-card, html.dark .shadow-sheet { box-shadow: 0 1px 2px rgba(0,0,0,.4) !important; }
+body { background: var(--page); @apply text-navy antialiased; font-feature-settings: "cv11", "ss01"; -webkit-tap-highlight-color: transparent; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
 .tnum { font-variant-numeric: tabular-nums; }
 
 @layer components {
-  .card { @apply bg-white rounded-2xl border border-line shadow-card; }
+  .card { @apply bg-surface rounded-2xl border border-line shadow-card; }
   .pill { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-[3px] text-[11px] font-semibold leading-4 whitespace-nowrap; }
   .btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-xl bg-emerald text-white font-semibold active:scale-[.98] transition disabled:opacity-50; }
-  .btn-ghost { @apply inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-[#F1F4F3] text-navy font-semibold active:scale-[.98] transition; }
+  .btn-ghost { @apply inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-offwhite text-navy font-semibold active:scale-[.98] transition; }
   .chip-opt { @apply rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition whitespace-nowrap; }
   .chip-on { @apply border-emerald bg-mint text-forest; }
-  .chip-off { @apply border-line bg-white text-navy; }
+  .chip-off { @apply border-line bg-surface text-navy; }
   .section-label { @apply text-[12px] font-bold tracking-wide text-emerald uppercase; }
 }

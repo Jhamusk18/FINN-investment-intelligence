@@ -67,17 +67,17 @@ export default function Push() {
             <p className="mt-0.5 text-[12.5px] text-slate2">Last updated: {data ? stamp(data.generated_at) : '…'}{loading && data ? ' · refreshing' : ''}</p>
           </div>
           <div className="flex shrink-0 gap-2 pt-1">
-            <button aria-label="Search feed" onClick={() => { setSearchOpen(!searchOpen); if (searchOpen) setText('') }} className="grid h-11 w-11 place-items-center rounded-full border border-line bg-white shadow-card">
+            <button aria-label="Search feed" onClick={() => { setSearchOpen(!searchOpen); if (searchOpen) setText('') }} className="grid h-11 w-11 place-items-center rounded-full border border-line bg-surface shadow-card">
               {searchOpen ? <X size={19} /> : <Search size={19} />}
             </button>
-            <button aria-label="Filters" onClick={() => openSheet()} className="relative grid h-11 w-11 place-items-center rounded-full border border-line bg-white shadow-card">
+            <button aria-label="Filters" onClick={() => openSheet()} className="relative grid h-11 w-11 place-items-center rounded-full border border-line bg-surface shadow-card">
               <SlidersHorizontal size={19} />
               {active && <span className="absolute right-0.5 top-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald" />}
             </button>
           </div>
         </div>
         {searchOpen && (
-          <div className="mt-3 flex items-center gap-2 rounded-xl border border-line bg-white px-3 py-2.5 animate-fadein">
+          <div className="mt-3 flex items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2.5 animate-fadein">
             <Search size={17} className="text-slate2" />
             <input autoFocus value={text} onChange={(e) => setText(e.target.value)} placeholder="Search filings, companies, categories…" className="w-full bg-transparent text-[14px] outline-none" />
           </div>
@@ -90,7 +90,7 @@ export default function Push() {
               <button key={k} onClick={() => setFilters({ ...filters, priority: on ? 'all' : k })}
                 className={`rounded-2xl border py-2.5 text-center transition ${cls} ${on ? 'ring-2 ring-offset-1 ring-current' : ''} ${filters.priority !== 'all' && !on ? 'opacity-55' : ''}`}>
                 <div className="text-[30px] font-extrabold leading-none tnum">{data ? counts[k] : '–'}</div>
-                <div className="mt-1 text-[12px] font-semibold tracking-wide text-navy">{label}</div>
+                <div className="mt-1 text-[12px] font-semibold tracking-wide text-[#142B3A]">{label}</div>
               </button>
             )
           })}
@@ -100,7 +100,7 @@ export default function Push() {
           {[['priority', L.priority, filters.priority !== 'all'], ['companies', L.companies, filters.companies.length > 0],
             ['window', L.window, filters.window !== '24h'], ['categories', L.categories, filters.categories.length > 0]].map(([k, l, on]) => (
             <button key={k} onClick={() => openSheet(k)}
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-[13.5px] font-semibold ${on || k === 'priority' ? 'border-emerald text-navy' : 'border-line text-navy'} ${on ? 'bg-mint' : 'bg-white'}`}>
+              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-[13.5px] font-semibold ${on || k === 'priority' ? 'border-emerald text-navy' : 'border-line text-navy'} ${on ? 'bg-mint' : 'bg-surface'}`}>
               {k === 'priority' && <SlidersHorizontal size={14} className="text-emerald" />}{l}<ChevronDown size={15} className="text-slate2" />
             </button>
           ))}
@@ -133,7 +133,7 @@ export default function Push() {
           </button>
         </div>
 
-        {!data && loading && [0, 1, 2].map((i) => <div key={i} className="card h-[132px] animate-pulse bg-white" />)}
+        {!data && loading && [0, 1, 2].map((i) => <div key={i} className="card h-[132px] animate-pulse bg-surface" />)}
 
         {data && !visible.length && (
           <div className="card flex flex-col items-center px-6 py-8 text-center">
@@ -219,7 +219,7 @@ function AskCard({ companies, alerts }) {
       </div>
       <div className="mt-3 grid grid-cols-1 gap-2.5">
         <label className="text-[13px] font-semibold text-navy">Company
-          <div className="mt-1 flex items-center gap-2 rounded-xl border border-line bg-white px-3">
+          <div className="mt-1 flex items-center gap-2 rounded-xl border border-line bg-surface px-3">
             <Building2 size={17} className="text-slate2" />
             <select value={sym} onChange={(e) => setSym(e.target.value)} className="h-11 w-full bg-transparent text-[14px] text-navy outline-none">
               <option value="">Select a company</option>

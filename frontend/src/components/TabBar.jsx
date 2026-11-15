@@ -9,7 +9,7 @@ const TABS = [
 
 export default function TabBar() {
   return (
-    <nav className="shrink-0 border-t border-line bg-white/95 backdrop-blur pb-[env(safe-area-inset-bottom)]">
+    <nav className="shrink-0 border-t border-line bg-surface/95 backdrop-blur pb-[env(safe-area-inset-bottom)]">
       <div className="grid grid-cols-3">
         {TABS.map(({ to, label, Icon }) => (
           <NavLink key={to} to={to} className="relative flex flex-col items-center gap-1 pt-2.5 pb-2.5">

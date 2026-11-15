@@ -1,16 +1,18 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     extend: {
       colors: {
-        forest: '#075B43',
-        emerald: { DEFAULT: '#0D9367', 600: '#0D9367', 700: '#0A7C57' },
-        mint: '#E7F5EF',
-        offwhite: '#F6F9F8',
-        navy: '#142B3A',
-        slate2: '#536273',
-        line: '#E2E9E6',
+        forest: 'rgb(var(--c-forest) / <alpha-value>)',
+        emerald: { DEFAULT: 'rgb(var(--c-emerald) / <alpha-value>)', 600: 'rgb(var(--c-emerald) / <alpha-value>)', 700: 'rgb(var(--c-emerald-700) / <alpha-value>)' },
+        mint: 'rgb(var(--c-mint) / <alpha-value>)',
+        offwhite: 'rgb(var(--c-offwhite) / <alpha-value>)',
+        surface: 'rgb(var(--c-surface) / <alpha-value>)',
+        navy: 'rgb(var(--c-navy) / <alpha-value>)',
+        slate2: 'rgb(var(--c-slate) / <alpha-value>)',
+        line: 'rgb(var(--c-line) / <alpha-value>)',
         hi: { bg: '#FDECEC', fg: '#C81E1E', bd: '#F5B5B5', bar: '#E5484D' },
         md: { bg: '#FFF6E0', fg: '#A35F00', bd: '#F5D58A', bar: '#F2B01E' },
         rt: { bg: '#E9F7EF', fg: '#0A7C57', bd: '#BFE6D0', bar: '#2FB57F' },

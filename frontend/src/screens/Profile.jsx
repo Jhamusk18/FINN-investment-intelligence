@@ -8,6 +8,7 @@ import Sheet from '../components/Sheet'
 import { useApp } from '../lib/ctx'
 import { api } from '../lib/api'
 import { useLocal } from '../lib/store'
+import { setTheme } from '../lib/theme'
 import { stamp } from '../lib/format'
 
 const ROWS = [
@@ -34,6 +35,7 @@ export default function Profile() {
   const nav = useNavigate()
   const { portfolio, companies, followed, setFollowed, followedSet, thresholds, setThresholdsOpen, saved, setSaved, prefs, setPrefs } = useApp()
   const [panel, setPanel] = useState(null)
+  const [themePref, setThemePref] = useLocal('theme', 'system')
   const [st, setSt] = useState(null)
   const [fb, setFb] = useLocal('feedback', [])
   const [draft, setDraft] = useState('')
@@ -50,7 +52,7 @@ export default function Profile() {
   return (
     <div className="h-full overflow-y-auto no-scrollbar">
       <header className="bg-[#E4F2EB] px-4 pb-14 pt-[max(16px,env(safe-area-inset-top))]">
-        <BrandRow right={<span className="inline-flex items-center gap-2 rounded-full border border-[#BFE6D0] bg-[#EAF7F0] px-3.5 py-1.5 text-[13px] font-semibold text-forest"><span className="h-2 w-2 rounded-full bg-emerald" />Guest</span>} />
+        <BrandRow right={<span className="inline-flex items-center gap-2 rounded-full border border-[#BFE6D0] bg-mint px-3.5 py-1.5 text-[13px] font-semibold text-forest"><span className="h-2 w-2 rounded-full bg-emerald" />Guest</span>} />
         <h1 className="mt-6 text-[30px] font-extrabold text-navy">Profile</h1>
         <p className="text-[14.5px] text-slate2">Your FINN preferences, saved on this device</p>
       </header>
@@ -85,7 +87,7 @@ export default function Profile() {
           <p className="mt-2 text-[14.5px] text-navy">You are exploring FINN as a guest.</p>
           <p className="text-[12.5px] text-slate2">Preferences are saved on this device only. No account, no cloud sync.</p>
         </section>
-        <button onClick={() => nav('/')} className="h-12 w-full rounded-2xl border border-line bg-white text-[15px] font-semibold text-forest shadow-card">Exit guest mode</button>
+        <button onClick={() => nav('/')} className="h-12 w-full rounded-2xl border border-line bg-surface text-[15px] font-semibold text-forest shadow-card">Exit guest mode</button>
       </main>
 
       <Sheet open={panel === 'portfolio'} onClose={() => setPanel(null)} title="Portfolio preferences"
@@ -134,9 +136,14 @@ export default function Profile() {
       <Sheet open={panel === 'data'} onClose={() => setPanel(null)} title="Appearance & data">
         <div className="px-5 py-3">
           <div className="section-label">Display</div>
-          <div className="mt-2 flex gap-2">
+          <div className="mt-2 text-[12.5px] text-slate2">Theme</div>
+          <div className="mt-1.5 flex flex-wrap gap-2">
+            {[['system', 'System'], ['light', 'Light'], ['dark', 'Dark']].map(([k, l]) => (
+              <button key={k} onClick={() => { setTheme(k); setThemePref(k) }} className={`chip-opt ${themePref === k ? 'chip-on' : 'chip-off'}`}>{l}</button>
+            ))}
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2">
             {['comfortable', 'compact'].map((d) => <button key={d} onClick={() => setPrefs({ ...prefs, density: d })} className={`chip-opt ${prefs.density === d ? 'chip-on' : 'chip-off'}`}>{d[0].toUpperCase() + d.slice(1)}</button>)}
-            <span className="chip-opt chip-off opacity-50">Dark theme · soon</span>
           </div>
           <div className="mt-5 section-label">Data sources · live status</div>
           {!st && <p className="py-3 text-[13px] text-slate2">Checking…</p>}

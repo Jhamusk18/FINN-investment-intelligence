@@ -11,7 +11,7 @@ function Opt({ on, children, onClick }) {
 function Box({ on, label, onClick }) {
   return (
     <button type="button" onClick={onClick} className="flex items-center gap-2.5 py-1 text-[14px] text-navy">
-      <span className={`grid h-[18px] w-[18px] place-items-center rounded-[5px] border ${on ? 'border-emerald bg-emerald text-white' : 'border-[#B8C4BF] bg-white'}`}>
+      <span className={`grid h-[18px] w-[18px] place-items-center rounded-[5px] border ${on ? 'border-emerald bg-emerald text-white' : 'border-[#B8C4BF] bg-surface'}`}>
         {on && <Check size={13} strokeWidth={3} />}
       </span>
       {label}
@@ -47,7 +47,7 @@ export default function FilterSheet({ open, onClose, applied, onApply, focus, co
       right={<button className="text-[15px] font-semibold text-emerald" onClick={() => { onApply(DEFAULT_FILTERS); onClose() }}>Reset</button>}
       footer={
         <div className="flex gap-3">
-          <button className="btn-ghost h-12 flex-[0.8] bg-white" onClick={() => setD(DEFAULT_FILTERS)}>Clear all</button>
+          <button className="btn-ghost h-12 flex-[0.8] bg-surface" onClick={() => setD(DEFAULT_FILTERS)}>Clear all</button>
           <button className="btn-primary h-12 flex-[1.6] bg-[#0B8A5E]" onClick={() => { onApply(d); onClose() }}>Apply filters</button>
         </div>
       }
